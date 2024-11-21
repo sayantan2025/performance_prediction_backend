@@ -1,26 +1,31 @@
+
+
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-from model import predict_8th_sem
+from model import predict_marks  # Importing the prediction function from model.py
 
 app = Flask(__name__)
-CORS(app)  # Allow CORS for local testing
-@app.route("/", methods=["GET"])
-def home():
-    return "Welcome to the Flask App!"
 
-@app.route("/predict", methods=["POST"])
+@app.route('/api/predict', methods=['POST'])
 def predict():
     try:
-        # Parse incoming JSON data
+        # Get the input data from the request
         data = request.json
-        sem_marks = [
-            data["sem1"], data["sem2"], data["sem3"],
-            data["sem4"], data["sem5"], data["sem6"], data["sem7"]
-        ]
-        prediction = predict_8th_sem(sem_marks)
+        sem1 = data['sem1']
+        sem2 = data['sem2']
+        sem3 = data['sem3']
+        sem4 = data['sem4']
+        sem5 = data['sem5']
+        sem6 = data['sem6']
+        sem7 = data['sem7']
+        
+        # Call the predict function from model.py
+        prediction = predict_marks(sem1, sem2, sem3, sem4, sem5, sem6, sem7)
+        
+        # Return the prediction as a JSON response
         return jsonify({"predicted_8th_sem": prediction})
+    
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True)
