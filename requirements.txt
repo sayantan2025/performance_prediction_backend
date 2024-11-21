@@ -1,3 +1,2 @@
 flask
-vercel-python
 flask-cors
