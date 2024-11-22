@@ -1,14 +1,16 @@
 from flask import Flask, request, jsonify
 from joblib import load
+import os
 
 app = Flask(__name__)
 
-# Load the pre-trained model
+# Load the model at the start when the app starts
+model = None
 try:
-    model = load('model.joblib')
-    print("Model loaded successfully!")
-except FileNotFoundError:
-    print("Error: model.joblib file not found. Ensure the file exists in the deployment directory.")
+    model = load('model.joblib')  # Make sure the model is loaded at startup
+    print("Model loaded successfully")
+except Exception as e:
+    print(f"Error loading model: {e}")
 
 @app.route('/')
 def home():
@@ -17,15 +19,11 @@ def home():
 @app.route('/api/predict', methods=['POST'])
 def predict():
     try:
+        if model is None:
+            return jsonify({"error": "Model is not loaded"})
+        
         # Get the input data from the request
         data = request.json
-        required_keys = ['sem1', 'sem2', 'sem3', 'sem4', 'sem5', 'sem6', 'sem7']
-
-        # Validate input keys
-        if not all(key in data for key in required_keys):
-            return jsonify({"error": "Missing one or more required keys: sem1, sem2, sem3, sem4, sem5, sem6, sem7"}), 400
-
-        # Extract features
         sem1 = data['sem1']
         sem2 = data['sem2']
         sem3 = data['sem3']
@@ -44,7 +42,7 @@ def predict():
         return jsonify({"predicted_8th_sem": prediction[0]})
     
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": str(e)})
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=10000)
