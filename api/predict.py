@@ -1,8 +1,10 @@
 import os
 from flask import Flask, request, jsonify
 from joblib import load
+from flask_cors import CORS  # 👈 NEW
 
 app = Flask(__name__)
+CORS(app)  # 👈 Allow all domains (or configure if needed)
 
 model_path = 'model.joblib'  # Path to your model file
 
